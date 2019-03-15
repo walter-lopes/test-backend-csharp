@@ -67,19 +67,8 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
         [TestCase("AAA", "BBB")]
         public void Return_Throws_Exception_When_Create(string issuerNameCetip, string issuerNameCustodyManager)
         {
-            var issuerResponse = new GetIssuerParseResponse();
-
-            _mediator.Send(new GetIssuerParseQuery { IssuerNameCetip = issuerNameCetip })
-                .ReturnsForAnyArgs(Response<GetIssuerParseResponse>.Ok(issuerResponse));
-
-            _mediator.Send(new GetIssuerParseQuery()).ReturnsForAnyArgs(Response<GetIssuerParseResponse>.Ok(issuerResponse));
-
-            var issuerParse = new IssuerParseDto { IssuerNameCetip = issuerNameCetip, IssuerNameCustodyManager = issuerNameCustodyManager };
-            var createIssuerRequest = new CreateIssuerParseCommand {IssuerParse = issuerParse};
-
-            _issuerParseRepository.Create(Arg.Any<IssuerParse>()).Returns(x => throw new Exception());
-
-            Assert.ThrowsAsync<Exception>(async () => await _createHandler.Handle(createIssuerRequest, CancellationToken.None));
+            // IMPLEMETAR !!
+            Assert.IsTrue(false);
         }
 
         [Test]
