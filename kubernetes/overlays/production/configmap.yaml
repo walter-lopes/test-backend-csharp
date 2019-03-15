@@ -1,0 +1,11 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    ASPNETCORE_ENVIRONMENT: Production
+  kind: ConfigMap
+  metadata:
+    name: parser
+    namespace: infohub
+kind: List
+metadata:

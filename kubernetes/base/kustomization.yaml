@@ -1,0 +1,8 @@
+namespace: infohub
+commonLabels:
+  business: infohub
+
+resources:
+  - service.yaml
+  - deployment.yaml
+  - hpa.yaml

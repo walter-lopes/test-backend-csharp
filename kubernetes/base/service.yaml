@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: parser
+  namespace: infohub
+  labels:
+    run: parser
+spec:
+  ports:
+    -
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    run: parser
+  sessionAffinity: None
+  type: ClusterIP

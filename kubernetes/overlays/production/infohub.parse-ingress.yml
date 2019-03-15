@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: infohub-parser-ingress
+  namespace: infohub
+spec:
+  rules:
+  - host: bootstrap-ems-prod.easynvest.com.br
+    http:
+      paths:
+      - backend:
+          serviceName: parser
+          servicePort: 80
+        path: /api/parser

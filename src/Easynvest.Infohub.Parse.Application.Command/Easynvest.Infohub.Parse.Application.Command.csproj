@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Easynvest.Logger" Version="0.1.7" />
+    <PackageReference Include="MediatR" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Easynvest.Infohub.Parse.Application.Query\Easynvest.Infohub.Parse.Application.Query.csproj" />
+    <ProjectReference Include="..\Easynvest.Infohub.Parse.Domain\Easynvest.Infohub.Parse.Domain.csproj" />
+    <ProjectReference Include="..\Easynvest.Infohub.Parse.Infra.CrossCutting\Easynvest.Infohub.Parse.Infra.CrossCutting.csproj" />
+  </ItemGroup>
+
+</Project>
