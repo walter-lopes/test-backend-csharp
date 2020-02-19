@@ -65,23 +65,17 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
 
         public async Task Update(IssuerParse parse)
         {
-            var key = GetKeyValue(parse.IssuerNameCetip);
-
             await _repository.Update(parse);
+
+            var key = GetKeyValue(parse.IssuerNameCetip);
 
             var issuerParseDto = new IssuerParserDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
 
             _cache.Set(key, issuerParseDto);
         }
 
-        private string GetKeyValue(IssuerParse parse)
-        {
-            return $"{_key}:{parse.IssuerNameCetip}";
-        }
+        private string GetKeyValue(IssuerParse parse) => $"{_key}:{parse.IssuerNameCetip}";
 
-        private string GetKeyValue(string issuerNameCetip)
-        {
-            return $"{_key}:{issuerNameCetip}";
-        }
+        private string GetKeyValue(string issuerNameCetip) => $"{_key}:{issuerNameCetip}";
     }
 }
