@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Easynvest.Infohub.Parse.Infra.IoC;
 using Easynvest.Infohub.Parse.Api.Helpers;
 using Easynvest.Infohub.Parse.Api.HealthChecks;
+using Easynvest.Infohub.Parse.Infra.CrossCutting.Sections;
 
 namespace Easynvest.Infohub.Parse.Api
 {
@@ -42,6 +43,8 @@ namespace Easynvest.Infohub.Parse.Api
                 .AddHealthCheck()
                 .AddMvc(configuration => configuration.Filters.Add(typeof(HtmlDecoderFilter)))
                 .AddJsonOptions(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
+
+            services.Configure<RedisSection>(options => Configuration.GetSection("RedisSection").Bind(options));
 
             services.AddSwaggerGen(options =>
             {
