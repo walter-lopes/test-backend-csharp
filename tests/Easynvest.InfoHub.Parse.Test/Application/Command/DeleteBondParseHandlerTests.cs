@@ -22,7 +22,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
         private DeleteBondParseHandler _deleteBondHandler;
         private IBondParseRepository _bondParseRepository;
         private AuthenticatedUser _authenticatedUser;
-        private Infohub.Parse.Infra.CrossCutting.Log.Logger _log;
+       
         private IMediator _mediator;
 
         [SetUp]
@@ -31,7 +31,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
             _logger = Substitute.For<ILogger<DeleteBondParseHandler>>();
             _bondParseRepository = Substitute.For<IBondParseRepository>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
-            _log = new Infohub.Parse.Infra.CrossCutting.Log.Logger(_authenticatedUser);
+            
             _mediator = Substitute.For<IMediator>();
             _deleteBondHandler = new DeleteBondParseHandler(_logger, _authenticatedUser, _bondParseRepository, _mediator);
         }

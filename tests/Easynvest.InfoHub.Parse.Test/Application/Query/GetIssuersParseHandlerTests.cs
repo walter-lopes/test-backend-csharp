@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Easynvest.Infohub.Parse.Application.Query.Handlers;
 using Easynvest.Infohub.Parse.Application.Query.Queries;
 using Easynvest.Infohub.Parse.Domain.Interfaces;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Authorization;
+using Easynvest.Infohub.Parse.Infra.CrossCutting.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -14,25 +16,26 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
     public class GetIssuersParseHandlerTests
     {
         private ILogger<GetIssuersParseHandler> _logger;
-        private IIssuerParseRepository _issuerParserRepository;
+        private Func<RepositoryType, IIssuerParseRepository> _issuerParseRepository;
         private GetIssuersParseHandler _getIssuersHandler;
         private AuthenticatedUser _authenticatedUser;
-        private Infohub.Parse.Infra.CrossCutting.Log.Logger _log;
+
 
         [SetUp]
         public void SetUp()
         {
             _logger = Substitute.For<ILogger<GetIssuersParseHandler>>();
-            _issuerParserRepository = Substitute.For<IIssuerParseRepository>();
+            _issuerParseRepository = Substitute.For<Func<RepositoryType, IIssuerParseRepository>>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
-            _log = new Infohub.Parse.Infra.CrossCutting.Log.Logger(_authenticatedUser);
-            _getIssuersHandler = new GetIssuersParseHandler(_logger, _authenticatedUser, _issuerParserRepository);
+            _getIssuersHandler = new GetIssuersParseHandler(_logger, _authenticatedUser, _issuerParseRepository);
         }
 
         [Test]
         public void Should_Return_Response_Failure_With_Exception()
         {
-            _issuerParserRepository.When(x => x.GetAll()).Do(x => throw new Exception());
+            var mock = _issuerParseRepository(RepositoryType.Cache);
+
+            mock.When(x => x.GetAll()).Do(x => throw new Exception());
 
             Assert.ThrowsAsync<Exception>(async () => await _getIssuersHandler.Handle(new GetIssuersParseQuery(), CancellationToken.None));
         }

@@ -17,7 +17,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
         private IBondParseRepository _bondParserRepository;
         private GetBondsParseHandler _getBondsHandler;
         private AuthenticatedUser _authenticatedUser;
-        private Infohub.Parse.Infra.CrossCutting.Log.Logger _log;
+       
 
         [SetUp]
         public void SetUp()
@@ -25,7 +25,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
             _logger = Substitute.For<ILogger<GetBondsParseHandler>>();
             _bondParserRepository = Substitute.For<IBondParseRepository>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
-            _log = new Infohub.Parse.Infra.CrossCutting.Log.Logger(_authenticatedUser);
+            
             _getBondsHandler = new GetBondsParseHandler(_logger, _authenticatedUser, _bondParserRepository);
         }
 

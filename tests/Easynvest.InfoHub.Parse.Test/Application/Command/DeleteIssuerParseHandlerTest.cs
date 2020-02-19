@@ -14,27 +14,28 @@ using System;
 using System.Threading;
 using Easynvest.Infohub.Parse.Application.Query.Dtos;
 using Easynvest.Infohub.Parse.Domain.Entities;
+using Easynvest.Infohub.Parse.Infra.CrossCutting.Repositories;
 
 namespace Easynvest.InfoHub.Parse.Test.Application.Command
 {
     public class DeleteIssuerParseHandlerTest
     {
         private ILogger<DeleteIssuerParseHandler> _logger;
-        private DeleteIssuerParseHandler _deleteBondHandler;
-        private IIssuerParseRepository _bondParseRepository;
+        private DeleteIssuerParseHandler _deleteIssuerHandler;
+        private Func<RepositoryType, IIssuerParseRepository> _issuerParseRepository;
         private AuthenticatedUser _authenticatedUser;
-        private Infohub.Parse.Infra.CrossCutting.Log.Logger _log;
+       
         private IMediator _mediator;
 
         [SetUp]
         public void SetUp()
         {
             _logger = Substitute.For<ILogger<DeleteIssuerParseHandler>>();
-            _bondParseRepository = Substitute.For<IIssuerParseRepository>();
+            _issuerParseRepository = Substitute.For<Func<RepositoryType, IIssuerParseRepository>>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
-            _log = new Infohub.Parse.Infra.CrossCutting.Log.Logger(_authenticatedUser);
+            
             _mediator = Substitute.For<IMediator>();
-            _deleteBondHandler = new DeleteIssuerParseHandler(_logger, _authenticatedUser, _bondParseRepository, _mediator);
+            _deleteIssuerHandler = new DeleteIssuerParseHandler(_logger, _authenticatedUser, _issuerParseRepository, _mediator);
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
                 .ReturnsForAnyArgs(Response<GetIssuerParseResponse>.Ok(issuerResponse));
 
             var deleteBondParseCommand = new DeleteIssuerParseCommand { IssuerNameCetip = issuerNameCetip };
-            var response = _deleteBondHandler.Handle(deleteBondParseCommand, CancellationToken.None);
+            var response = _deleteIssuerHandler.Handle(deleteBondParseCommand, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -75,16 +76,18 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
 
             var deleteIssuerParseCommand = new DeleteIssuerParseCommand { IssuerNameCetip = issuerNameCetip };
 
-            _bondParseRepository.Delete(Arg.Any<IssuerParse>()).Returns(x => throw new Exception());
+            var mock = _issuerParseRepository(RepositoryType.Cache);
 
-            Assert.ThrowsAsync<Exception>(async () => await _deleteBondHandler.Handle(deleteIssuerParseCommand, CancellationToken.None));
+            mock.When(x => x.Delete(Arg.Any<IssuerParse>())).Do(x => throw new Exception());
+
+            Assert.ThrowsAsync<Exception>(async () => await _deleteIssuerHandler.Handle(deleteIssuerParseCommand, CancellationToken.None));
         }
 
         [Test]
         public void Should_Return_Failure_When_Parameter_Is_Null()
         {
             var request = new DeleteIssuerParseCommand();
-            var response = _deleteBondHandler.Handle(request, CancellationToken.None);
+            var response = _deleteIssuerHandler.Handle(request, CancellationToken.None);
 
             Assert.Multiple(() =>
             {
@@ -98,7 +101,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
         [Test]
         public void Should_Return_Failure_When_Command_Is_Null()
         {
-            var response = _deleteBondHandler.Handle(null, CancellationToken.None);
+            var response = _deleteIssuerHandler.Handle(null, CancellationToken.None);
 
             Assert.Multiple(() =>
             {

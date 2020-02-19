@@ -3,8 +3,9 @@ using Easynvest.Infohub.Parse.Application.Query.Queries;
 using Easynvest.Infohub.Parse.Domain.Entities;
 using Easynvest.Infohub.Parse.Domain.Interfaces;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Authorization;
+using Easynvest.Infohub.Parse.Infra.CrossCutting.Repositories;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Responses;
-using Easynvest.Logger;
+
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -18,16 +19,16 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
         private readonly ILogger<UpdateIssuerParseHandler> _logger;
         private readonly IIssuerParseRepository _issuerParseRepository;
         private readonly AuthenticatedUser _authenticatedUser;
-        private readonly Infra.CrossCutting.Log.Logger _log;
+       
         private readonly IMediator _mediator;
 
-        public UpdateIssuerParseHandler(ILogger<UpdateIssuerParseHandler> logger, AuthenticatedUser authenticatedUser, IIssuerParseRepository issuerParseRepository,
+        public UpdateIssuerParseHandler(ILogger<UpdateIssuerParseHandler> logger, AuthenticatedUser authenticatedUser, Func<RepositoryType, IIssuerParseRepository> issuerParseRepository,
             IMediator mediator)
         {
             _logger = logger;
             _authenticatedUser = authenticatedUser;
-            _log = new Infra.CrossCutting.Log.Logger(_authenticatedUser);
-            _issuerParseRepository = issuerParseRepository;
+            
+            _issuerParseRepository = issuerParseRepository(RepositoryType.Cache);
             _mediator = mediator;
         }
 
@@ -37,7 +38,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
             {
                 if (request is null || request.IssuerParse is null)
                 {
-                    _logger.Warning(_log.SendLog("A requisição não pode ser nula."));
+                   //("A requisição não pode ser nula."));
                     return Response<Unit>.Fail("A requisição não pode ser nula.");
                 }
 
@@ -50,7 +51,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                         $"Ocorreu um erro durante a atualização do parse de emissores. Nome do emissor na Cetip: {issuerRequest.IssuerNameCetip}, " +
                         $"Nome do emissor na custódia: {issuerRequest.IssuerNameCustodyManager}.";
 
-                    _logger.Warning(_log.SendLog(messageLog));
+                   //(messageLog));
                     return Response<Unit>.Fail(issuerParse.Messages);
                 }
 
@@ -60,7 +61,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
 
                 if (issuerParse.IsFailure)
                 {
-                    _logger.Warning(_log.SendLog($"Ocorreu um erro durante a verificação de registro do título. { issuerParseValid.IssuerNameCetip }"));
+                   //($"Ocorreu um erro durante a verificação de registro do título. { issuerParseValid.IssuerNameCetip }"));
                     return Response<Unit>.Fail(issuerParse.Messages);
                 }
 
@@ -69,19 +70,19 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                     var messageLog = $"Não foi possível atualizar o parse de emissores, pois o requerido não existe." +
                                      $" Emissor na Cetip: { issuerParseValid.IssuerNameCetip }, Emissor na custódia: { issuerParseValid.IssuerNameCustodyManager }.";
 
-                    _logger.Warning(_log.SendLog(messageLog));
+                   //(messageLog));
                     return Response<Unit>.Fail($"Não foi possível atualizar o registro. Não existe resgistro com nome do emissor da Cetip requisitado.");
                 }
 
-                _logger.Debug(_log.SendLog("Iniciando a atualização do parse de emissores."));
+               //_log.SendLog("Iniciando a atualização do parse de emissores."));
                 await _issuerParseRepository.Update(issuerParse.Value);
-                _logger.Debug(_log.SendLog("O parse de emissores foi atualizado com sucesso."));
+               //_log.SendLog("O parse de emissores foi atualizado com sucesso."));
 
                 return Response<Unit>.Ok(new Unit());
             }
             catch (Exception ex)
             {
-                _logger.Error(_log.SendLog("Ocorreu um erro durante a atualização do parse de emissores."), ex);
+                //_log.SendLog("Ocorreu um erro durante a atualização do parse de emissores."), ex);
                 throw;
             }
         }

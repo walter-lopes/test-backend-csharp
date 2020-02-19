@@ -6,6 +6,7 @@ using Easynvest.Infohub.Parse.Application.Query.Responses;
 using Easynvest.Infohub.Parse.Domain.Entities;
 using Easynvest.Infohub.Parse.Domain.Interfaces;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Authorization;
+using Easynvest.Infohub.Parse.Infra.CrossCutting.Repositories;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -21,18 +22,18 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
     {
         private ILogger<CreateIssuerParseHandler> _logger;
         private CreateIssuerParseHandler _createHandler;
-        private IIssuerParseRepository _issuerParseRepository;
+        private Func<RepositoryType, IIssuerParseRepository> _issuerParseRepository;
         private AuthenticatedUser _authenticatedUser;
-        private Infohub.Parse.Infra.CrossCutting.Log.Logger _log;
+
         private IMediator _mediator;
 
         [SetUp]
         public void SetUp()
         {
             _logger = Substitute.For<ILogger<CreateIssuerParseHandler>>();
-            _issuerParseRepository = Substitute.For<IIssuerParseRepository>();
+            _issuerParseRepository = Substitute.For<Func<RepositoryType, IIssuerParseRepository>>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
-            _log = new Infohub.Parse.Infra.CrossCutting.Log.Logger(_authenticatedUser);
+
             _mediator = Substitute.For<IMediator>();
             _createHandler = new CreateIssuerParseHandler(_logger, _authenticatedUser, _issuerParseRepository, _mediator);
         }
@@ -47,9 +48,9 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
             _mediator.Send(new GetIssuerParseQuery { IssuerNameCetip = issuerNameCetip })
                 .ReturnsForAnyArgs(Response<GetIssuerParseResponse>.Ok(indexResponse));
 
-            var issuerParse = new IssuerParseDto { IssuerNameCetip = issuerNameCetip, IssuerNameCustodyManager = issuerNameCustodyManager};
+            var issuerParse = new IssuerParseDto { IssuerNameCetip = issuerNameCetip, IssuerNameCustodyManager = issuerNameCustodyManager };
 
-            var createIndexRequest = new CreateIssuerParseCommand {IssuerParse = issuerParse};
+            var createIndexRequest = new CreateIssuerParseCommand { IssuerParse = issuerParse };
             var response = _createHandler.Handle(createIndexRequest, CancellationToken.None);
 
             Assert.Multiple(() =>
@@ -67,8 +68,19 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
         [TestCase("AAA", "BBB")]
         public void Return_Throws_Exception_When_Create(string issuerNameCetip, string issuerNameCustodyManager)
         {
-            // IMPLEMETAR !!
-            Assert.IsTrue(false);
+            var issuerResponse = new GetIssuerParseResponse { IssuerParse = null };
+
+            _mediator.Send(new GetIssuerParseQuery { IssuerNameCetip = issuerNameCetip })
+                .ReturnsForAnyArgs(Response<GetIssuerParseResponse>.Ok(issuerResponse));
+
+            var issuerParse = new IssuerParseDto { IssuerNameCetip = issuerNameCetip, IssuerNameCustodyManager = issuerNameCustodyManager };
+            var createIssuerRequest = new CreateIssuerParseCommand { IssuerParse = issuerParse  };
+
+            var mock = _issuerParseRepository(RepositoryType.Cache);
+
+            mock.When(x => x.Create(Arg.Any<IssuerParse>())).Do(x => throw new Exception());
+
+            Assert.ThrowsAsync<Exception>(async () => await _createHandler.Handle(createIssuerRequest, CancellationToken.None));
         }
 
         [Test]
@@ -77,7 +89,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
         public void Should_Return_Failure_When_Parameters_Is_Invalid(string issuerNameCetip, string issuerNameCustodyManager)
         {
             var issuerParse = new IssuerParseDto { IssuerNameCetip = issuerNameCetip, IssuerNameCustodyManager = issuerNameCustodyManager };
-            var createIssuerRequest = new CreateIssuerParseCommand {IssuerParse = issuerParse};
+            var createIssuerRequest = new CreateIssuerParseCommand { IssuerParse = issuerParse };
 
             var response = _createHandler.Handle(createIssuerRequest, CancellationToken.None);
 
@@ -110,8 +122,8 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
         public void Should_Return_Failure_When_Already_Has_Issuer_Parse_Registry(string issuerNameCetip, string issuerNameCustodyManager)
         {
             var issuerParseFound = new Infohub.Parse.Application.Query.Dtos.IssuerParseDto
-                {IssuerNameCetip = issuerNameCetip, IssuerNameCustodyManager = issuerNameCustodyManager};
-            var issuerResponse = new GetIssuerParseResponse {IssuerParse = issuerParseFound};
+            { IssuerNameCetip = issuerNameCetip, IssuerNameCustodyManager = issuerNameCustodyManager };
+            var issuerResponse = new GetIssuerParseResponse { IssuerParse = issuerParseFound };
 
             _mediator.Send(new GetIssuerParseQuery { IssuerNameCetip = issuerNameCetip })
                 .ReturnsForAnyArgs(Response<GetIssuerParseResponse>.Ok(issuerResponse));

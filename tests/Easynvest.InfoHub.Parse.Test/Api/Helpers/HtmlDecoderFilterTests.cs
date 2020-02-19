@@ -22,14 +22,14 @@ namespace Easynvest.InfoHub.Parse.Test.Api.Helpers
 
         private ILogger<HtmlDecoderFilter> _logger;
         private AuthenticatedUser _authenticatedUser;
-        private Infohub.Parse.Infra.CrossCutting.Log.Logger _log;
+       
 
         [SetUp]
         public void SetUp()
         {
             _logger = Substitute.For<ILogger<HtmlDecoderFilter>>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
-            _log = new Infohub.Parse.Infra.CrossCutting.Log.Logger(_authenticatedUser);
+            
 
             _decoderFilter = new HtmlDecoderFilter(_logger, _authenticatedUser);
             _actionContext = new ActionContext(new DefaultHttpContext(), new RouteData(), new ActionDescriptor());

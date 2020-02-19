@@ -1,5 +1,5 @@
 ﻿using Easynvest.Infohub.Parse.Infra.CrossCutting.Authorization;
-using Easynvest.Logger;
+
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,13 +12,13 @@ namespace Easynvest.Infohub.Parse.Api.Helpers
     {
         private readonly ILogger<HtmlDecoderFilter> _logger;
         private readonly AuthenticatedUser _authenticatedUser;
-        private readonly Infra.CrossCutting.Log.Logger _log;
+       
 
         public HtmlDecoderFilter(ILogger<HtmlDecoderFilter> logger, AuthenticatedUser authenticatedUser)
         {
             _logger = logger;
             _authenticatedUser = authenticatedUser;
-            _log = new Infra.CrossCutting.Log.Logger(_authenticatedUser);
+            
         }
 
         public void OnResourceExecuted(ResourceExecutedContext context) { }
@@ -27,7 +27,7 @@ namespace Easynvest.Infohub.Parse.Api.Helpers
         {
             try
             {
-                _logger.Debug(_log.SendLog($"Iniciando o decode da requisição."));
+               //_log.SendLog($"Iniciando o decode da requisição."));
                 var dictionary = context.RouteData.Values;
                 foreach (var value in dictionary.Values)
                 {
@@ -37,7 +37,7 @@ namespace Easynvest.Infohub.Parse.Api.Helpers
             }
             catch (Exception ex)
             {
-                _logger.Error(_log.SendLog($"Ocorreu um erro no decode da requisição"), ex);
+                //_log.SendLog($"Ocorreu um erro no decode da requisição"), ex);
                 throw;
             }
         }
