@@ -11,3 +11,10 @@ To run project you need to run these commands in root folder:
 ` docker run api-info-hub`
 
 ` docker run -d -p 6379:6379 -i -t redis:3.2.5-alpine`
+
+## Improvements
+
+Improve Redis resillience, maybe using Polly, for now to support fault tollerance I'm checking redis connection and logging if a error had been throw.
+
+If redis downs, the method `get all` of cache likely incosistence, this was a reason that I removed cached from this method, to solve this problem maybe working with events and buffer to fill cache when redis back?
+
