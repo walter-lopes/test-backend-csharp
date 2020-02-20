@@ -36,7 +36,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
             {
                 if (request is null || request.BondParse is null)
                 {
-                   //("A requisição não pode ser nulla."));
+                    _logger.LogError("A requisição não pode ser nulla.");
                     return Response<Unit>.Fail("A requisição não pode ser nula.");
                 }
 
@@ -49,7 +49,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                         $"Ocorreu um erro durante a criação do parse de papéis. Índice do papel: { bondRequest.BondIndex }, Tipo do papel: { bondRequest.BondType }," +
                         $"Estado do títuo: { bondRequest.IsAntecipatedSell }, Id da custódia do papel: { bondRequest.IdCustodyManagerBond }.";
 
-                   //(messageLog));
+                    _logger.LogError(messageLog);
                     return Response<Unit>.Fail(bondParse.Messages);
                 }
 
@@ -64,7 +64,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
 
                 if (bond.IsFailure)
                 {
-                   //("Ocorreu um erro durante a verificação se o papel requerido já existe na base."));
+                    _logger.LogError("Ocorreu um erro durante a verificação se o papel requerido já existe na base.");
                     return Response<Unit>.Fail(bond.Messages);
                 }
 
@@ -75,19 +75,19 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                                      $" Tipo de papel: { bondParseValid.BondType }, Índice do papel: { bondParseValid.BondIndex }," +
                                      $" Estado de venda: { bondParseValid.IsAntecipatedSell }, Id na custódia: { bondParseValid.IdCustodyManagerBond }.";
 
-                   //(messageLog));
+                    _logger.LogError(messageLog);
                     return Response<Unit>.Fail($"Não foi possível atualizar o registro. Não existe registro com tipo IF, indexador e código resgate requisitados.");
                 }
 
-               //_log.SendLog("Iniciando a atualização do parser de papéis."));
+                _logger.LogInformation("Iniciando a atualização do parser de papéis.");
                 await _bondParseRepository.Update(bondParseValid);
 
-               //_log.SendLog("O parser de papéis foi alterado com sucesso."));
+                _logger.LogInformation("O parser de papéis foi alterado com sucesso.");
                 return Response<Unit>.Ok(new Unit());
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Erro durante a atualização do parser de papéis."), ex);
+                 _logger.LogError("Erro durante a atualização do parser de papéis."+ ex);
                 throw;
             }
         }

@@ -34,21 +34,21 @@ namespace Easynvest.Infohub.Parse.Application.Query.Handlers
             {
                 if (request is null || request.IssuerNameCetip is null)
                 {
-                   //("A requisição não pode ser nula."));
+                    _logger.LogError("A requisição não pode ser nula.");
                     return Response<GetIssuerParseResponse>.Fail("A requisição não pode ser nula.");
                 }
 
-               //_log.SendLog("Buscando o emissor na base."));
+                _logger.LogInformation("Buscando o emissor na base.");
 
                 var issuerParse = await _issuerParseRepository.GetBy(request.IssuerNameCetip);
 
-               //_log.SendLog("O emissor foi encontrado com sucesso."));
+                _logger.LogInformation("O emissor foi encontrado com sucesso.");
 
                 return Response<GetIssuerParseResponse>.Ok(new GetIssuerParseResponse { IssuerParse = issuerParse.ToDto() });
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Ocorreu um erro durante a busca do emissor na base."), ex);
+                _logger.LogError("Ocorreu um erro durante a busca do emissor na base." + ex);
                 throw;
             }
         }

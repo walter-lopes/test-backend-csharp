@@ -18,7 +18,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
         private readonly ILogger<CreateBondParseHandler> _logger;
         private readonly IBondParseRepository _bondParseRepository;
         private readonly AuthenticatedUser _authenticatedUser;
-       
+
         private readonly IMediator _mediator;
 
         public CreateBondParseHandler(ILogger<CreateBondParseHandler> logger, AuthenticatedUser authenticatedUser, IBondParseRepository bondParseRepository,
@@ -27,7 +27,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
             _logger = logger;
             _bondParseRepository = bondParseRepository;
             _authenticatedUser = authenticatedUser;
-            
+
             _mediator = mediator;
         }
 
@@ -37,7 +37,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
             {
                 if (request is null || request.BondParse is null)
                 {
-                   //("A requisição não pode ser nula."));
+                    _logger.LogError("A requisição não pode ser nula.");
                     return Response<Unit>.Fail("A requisição não pode ser nula.");
                 }
 
@@ -50,7 +50,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                         $"Ocorreu um erro durante a criação do parse de papéis. Índice do papel: {request.BondParse.BondIndex}, Tipo do papel: {request.BondParse.BondType}," +
                         $"Estado do títuo: {request.BondParse.IsAntecipatedSell}, Id da custódia do papel: {request.BondParse.IdCustodyManagerBond}.";
 
-                   //(messageLog));
+                    _logger.LogError(messageLog);
                     return Response<Unit>.Fail(bond.Messages);
                 }
 
@@ -65,7 +65,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
 
                 if (bondParseFound.IsFailure)
                 {
-                   //("Ocorreu um erro durante o retorno do índice."));
+                    _logger.LogError("Ocorreu um erro durante o retorno do índice.");
                     return Response<Unit>.Fail(bondParseFound.Messages);
                 }
 
@@ -76,20 +76,20 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                         $" Tipo de papel: { bondParseValid.BondType }, Índice do papel: { bondParseValid.BondIndex }," +
                         $" Estado de venda: { bondParseValid.IsAntecipatedSell }, Id na custódia: { bondParseValid.IdCustodyManagerBond }.";
 
-                   //(messageLog));
+                    _logger.LogError(messageLog);
                     return Response<Unit>.Fail($"Não foi possível criar o registro. Já existe um registro com o tipo, " +
                                                                   $"índice e estado da venda do papel requisitado.");
                 }
 
-               //_log.SendLog("Iniciando a criação do parse dos papéis"));
+                _logger.LogInformation("Iniciando a criação do parse dos papéis");
                 await _bondParseRepository.Create(bondParseValid);
-               //_log.SendLog("O parse dos papéis foram inseridos com sucesso."));
+                _logger.LogInformation("O parse dos papéis foram inseridos com sucesso.");
 
                 return Response<Unit>.Ok();
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Erro durante a criação do parser de papéis."), ex);
+                _logger.LogError("Erro durante a criação do parser de papéis."+ ex);
                 throw;
             }
         }

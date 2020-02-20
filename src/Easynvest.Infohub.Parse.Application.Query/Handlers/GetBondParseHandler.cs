@@ -4,7 +4,6 @@ using Easynvest.Infohub.Parse.Application.Query.Responses;
 using Easynvest.Infohub.Parse.Domain.Interfaces;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Authorization;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Responses;
-
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -34,21 +33,21 @@ namespace Easynvest.Infohub.Parse.Application.Query.Handlers
             {
                 if (request is null)
                 {
-                   //("A requisição não pode ser nula."));
+                    _logger.LogError("A requisição não pode ser nula.");
                     return Response<GetBondParseResponse>.Fail("A requisição não pode ser nula.");
                 }
 
-               //_log.SendLog($"Buscando o título na base."));
+                _logger.LogInformation($"Buscando o título na base.");
 
                 var bondParse = await _bondParseRepository.GetBy(request.BondType, request.BondIndex, request.IsAntecipatedSell);
 
-               //_log.SendLog("O título foi encontrado com sucesso."));
+                _logger.LogInformation("O título foi encontrado com sucesso.");
 
                 return Response<GetBondParseResponse>.Ok(new GetBondParseResponse { BondParse = bondParse.ToDto() });
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Ocorreu um erro durante a busca do título na base."), ex);
+                _logger.LogError("Ocorreu um erro durante a busca do título na base."+ ex);
                 throw;
             }
         }

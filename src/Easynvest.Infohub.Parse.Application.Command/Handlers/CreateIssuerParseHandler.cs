@@ -38,7 +38,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
             {
                 if (request is null || request.IssuerParse is null)
                 {
-                   //("A requisição não pode ser nula."));
+                    _logger.LogError("A requisição não pode ser nula.");
                     return Response<Unit>.Fail("A requisição não pode ser nula.");
                 }
 
@@ -50,7 +50,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                         $"Ocorreu um erro durante a criação do parse de emissores. Nome do emissor na Cetip: {request.IssuerParse.IssuerNameCetip}, " +
                         $"Nome do emissor na custódia: {request.IssuerParse.IssuerNameCustodyManager}.";
 
-                   //(messageLog));
+                    _logger.LogError(messageLog);
                     return Response<Unit>.Fail(issuerParse.Messages);
                 }
 
@@ -61,7 +61,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
 
                 if (issuer.IsFailure)
                 {
-                   //($"Ocorreu um erro durante a verificação de registro do emissor. {issuerParse.Value.IssuerNameCetip}"));
+                    _logger.LogError($"Ocorreu um erro durante a verificação de registro do emissor. {issuerParse.Value.IssuerNameCetip}");
                     return Response<Unit>.Fail(issuer.Messages);
                 }
 
@@ -70,19 +70,19 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                     var messageLog = $"Não foi possível criar o parse de emissores, pois o requerido já é um parse de emissores existente." +
                                      $" Emissor na Cetip: {issuerParseValid.IssuerNameCetip}, Emissor na custódia: { issuerParseValid.IssuerNameCustodyManager}.";
 
-                   //(messageLog));
+                    _logger.LogError(messageLog);
                     return Response<Unit>.Fail($"Não foi possível criar o registro. Já existe um registro com nome do emissor requisitado.");
                 }
 
-               //_log.SendLog("Iniciando a criação do parse de emissores."));
+                _logger.LogInformation("Iniciando a criação do parse de emissores.");
                 await _issuerParseRepository.Create(issuerParseValid);
-               //_log.SendLog("O parse de emissores foi criado com sucesso."));
+                _logger.LogInformation("O parse de emissores foi criado com sucesso.");
 
                 return Response<Unit>.Ok(new Unit());
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Ocorreu um erro durante a criação do parse de emissores."), ex);
+                _logger.LogError("Ocorreu um erro durante a criação do parse de emissores."+  ex);
                 throw;
             }
         }

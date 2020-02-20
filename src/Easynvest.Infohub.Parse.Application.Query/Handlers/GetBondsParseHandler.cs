@@ -4,7 +4,6 @@ using Easynvest.Infohub.Parse.Application.Query.Responses;
 using Easynvest.Infohub.Parse.Domain.Interfaces;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Authorization;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Responses;
-
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -32,16 +31,16 @@ namespace Easynvest.Infohub.Parse.Application.Query.Handlers
         {
             try
             {
-               //_log.SendLog("Iniciando o retorno da lista de títulos."));
+                _logger.LogInformation("Iniciando o retorno da lista de títulos.");
 
                 var bondsParse = await _bondParseRepository.GetAll();
 
-               //_log.SendLog("Lista de parse de títulos retornada com sucesso."));
+                _logger.LogInformation("Lista de parse de títulos retornada com sucesso.");
                 return Response<GetBondsParseResponse>.Ok(new GetBondsParseResponse { BondsParse = bondsParse.ToDto() });
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Ocorreu um erro durante o retorno da lista de títulos."), ex);
+                _logger.LogInformation("Ocorreu um erro durante o retorno da lista de títulos."+ ex);
                 throw;
             }
         }

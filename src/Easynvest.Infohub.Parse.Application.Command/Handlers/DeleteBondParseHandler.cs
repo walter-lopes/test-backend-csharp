@@ -24,8 +24,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
         {
             _logger = logger;
             _bondParseRepository = bondParseRepository;
-            _authenticatedUser = authenticatedUser;
-            
+            _authenticatedUser = authenticatedUser;            
             _mediator = mediator;
         }
         public async Task<Response<Unit>> Handle(DeleteBondParseCommand request, CancellationToken cancellationToken)
@@ -34,11 +33,11 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
             {
                 if (request is null || request.BondIndex is null || request.BondType is null || request.IsAntecipatedSell is null)
                 {
-                   //("A requisição não pode ser nula."));
+                    _logger.LogError("A requisição não pode ser nula.");
                     return Response<Unit>.Fail("A requisição não pode ser nula.");
                 }
 
-               //("Buscando o registro entre a lista de papéis."));
+                _logger.LogInformation(("Buscando o registro entre a lista de papéis."));
                 var bondParse = await _mediator.Send(new GetBondParseQuery
                 {
                     BondType = request.BondType,
@@ -48,7 +47,7 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
 
                 if (bondParse.IsFailure)
                 {
-                   //("Ocorreu um erro durante o retorno da lista de papéis."));
+                    _logger.LogError("Ocorreu um erro durante o retorno da lista de papéis.");
                     return Response<Unit>.Fail(bondParse.Messages);
                 }
 
@@ -60,19 +59,19 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                                      $" Tipo de papel: { request.BondType }, Índice do papel: { request.BondIndex }," +
                                      $" Estado de venda: { request.IsAntecipatedSell }.";
 
-                   //(messageLog));
+                    _logger.LogError(messageLog);
                     return Response<Unit>.Fail($"Não foi possível remover o registro. Não existe registro com tipo IF, indexador e código resgate requisitados.");
                 }
 
-               //_log.SendLog("Iniciando a remoção do parse de papéis."));
+                _logger.LogInformation("Iniciando a remoção do parse de papéis.");
                 await _bondParseRepository.Delete(request.BondIndex, request.BondType, request.IsAntecipatedSell);
-               //_log.SendLog("O parser de papéis foi removido com sucesso."));
+                _logger.LogInformation("O parser de papéis foi removido com sucesso.");
 
                 return Response<Unit>.Ok(new Unit());
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Erro durante a remoção do parse de papéis."), ex);
+                _logger.LogError("Erro durante a remoção do parse de papéis." + ex);
                 throw;
             }
         }

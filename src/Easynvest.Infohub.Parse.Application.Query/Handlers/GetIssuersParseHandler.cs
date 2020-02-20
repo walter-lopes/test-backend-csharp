@@ -5,7 +5,6 @@ using Easynvest.Infohub.Parse.Domain.Interfaces;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Authorization;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Repositories;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Responses;
-
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -33,7 +32,7 @@ namespace Easynvest.Infohub.Parse.Application.Query.Handlers
         {
             try
             {
-               //_log.SendLog("Iniciando o retorno de parse de emissores."));
+                _logger.LogInformation("Iniciando o retorno de parse de emissores.");
 
                 var issuersParse = await _issuerParseRepository.GetAll();
 
@@ -41,7 +40,7 @@ namespace Easynvest.Infohub.Parse.Application.Query.Handlers
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Ocorreu um erro durante o retorno do parse de emissores."), ex);
+                _logger.LogError("Ocorreu um erro durante o retorno do parse de emissores."+ ex);
                 throw;
             }
         }

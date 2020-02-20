@@ -40,16 +40,16 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
             {
                 if (request is null || request.IssuerNameCetip is null)
                 {
-                   //("A requisição não pode ser nula."));
+                    _logger.LogError("A requisição não pode ser nula.");
                     return Response<Unit>.Fail("A requisição não pode ser nula.");
                 }
 
-               //("Buscando o registro na lista de emissores."));
+                _logger.LogInformation("Buscando o registro na lista de emissores.");
                 var issuerParse = await _mediator.Send(new GetIssuerParseQuery { IssuerNameCetip = request.IssuerNameCetip });
 
                 if (issuerParse.IsFailure)
                 {
-                   //("Ocorreu um erro durante o retorno da lista de títulos."));
+                    _logger.LogError(("Ocorreu um erro durante o retorno da lista de títulos."));
                     return Response<Unit>.Fail(issuerParse.Messages);
                 }
 
@@ -59,19 +59,19 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
                 {
                     var messageLog = $"Não foi possível remover o parse de emissores, pois ele não existe. Emissor na Cetip: { request.IssuerNameCetip }.";
 
-                   //(messageLog));
+                    _logger.LogError(messageLog);
                     return Response<Unit>.Fail($"Não foi possível remover o registro. Não existe registro com nome Cetip requisitado.");
                 }
 
-               //_log.SendLog("Iniciando a remoção do parse de emissores."));
+                _logger.LogInformation("Iniciando a remoção do parse de emissores.");
                 await _issuerParseRepository.Delete(IssuerParse.Create(issuersParseFound.IssuerNameCustodyManager, issuersParseFound.IssuerNameCetip).Value);
-               //_log.SendLog("O parser de emissores foi removido com sucesso."));
+                _logger.LogInformation("O parser de emissores foi removido com sucesso.");
 
                 return Response<Unit>.Ok(new Unit());
             }
             catch (Exception ex)
             {
-                //_log.SendLog("Ocorreu um erro durante a remoção do parse de emissores."), ex);
+                 _logger.LogError("Ocorreu um erro durante a remoção do parse de emissores."+ ex);
                 throw;
             }
         }
