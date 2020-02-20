@@ -6,6 +6,8 @@ In this project was implemented a new layer of cache using Redis. Redis is a cac
 
 To run project you need to run these commands in root folder:
 
-docker build . -t api-info-hub
-docker run api-info-hub
-docker run -d -p 6379:6379 -i -t redis:3.2.5-alpine
+# docker build . -t api-info-hub
+
+# docker run api-info-hub
+
+# docker run -d -p 6379:6379 -i -t redis:3.2.5-alpine
