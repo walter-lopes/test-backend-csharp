@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  api:
+    image: api-easy-info-hub
+    container_name: api-easy-info-hub
+    ports:
+      - "5001:80"
+    build:
+      context: ./
+      dockerfile: Dockerfile 
+    networks:
+      - easy
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - easy
+    # network_mode: host
+    volumes: 
+      - redis:/data
+
+volumes:
+  redis:
+    driver: local
+
+networks: 
+  easy: 
+    name: easy

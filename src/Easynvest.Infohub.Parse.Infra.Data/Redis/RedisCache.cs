@@ -1,5 +1,6 @@
 ﻿using Easynvest.Infohub.Parse.Domain.Interfaces;
 using Easynvest.Infohub.Parse.Infra.CrossCutting.Sections;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ServiceStack.Redis;
 using System.Collections.Generic;
@@ -9,15 +10,21 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Redis
     public class RedisCache : ICache
     {
         private readonly RedisClient redisClient;
+        private readonly ILogger<RedisCache> _logger;
 
-        public RedisCache(IOptions<RedisSection> options)
+        public RedisCache(IOptions<RedisSection> options, ILogger<RedisCache> logger)
         {
             var section = options.Value;
             redisClient = new RedisClient(section.Connection);
+            _logger = logger;
         }
 
         public void DeleteByKey<T>(string key)
         {
+
+            if (this.IsUnavailable())
+                return;
+
             using (redisClient)
             {
                 redisClient.Del(key);
@@ -27,6 +34,9 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Redis
 
         public T Get<T>(string key)
         {
+            if (this.IsUnavailable())
+                return default;
+
             using (redisClient)
             {
                 return redisClient.Get<T>(key);
@@ -35,6 +45,9 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Redis
 
         public IList<T> GetAll<T>()
         {
+            if (this.IsUnavailable())
+                return new List<T>();
+
             using (redisClient)
             {
                 var keys = redisClient.GetAllKeys();
@@ -52,10 +65,26 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Redis
 
         public void Set<T>(string key, T obj)
         {
+            if (this.IsUnavailable())
+                return;
+
             using (redisClient)
             {
                 redisClient.Set(key, obj);
             }
+        }
+
+        private bool IsUnavailable()
+        {
+            try
+            {
+                return !this.redisClient.Ping();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError("Falha ao conectar com o Redis" + ex);
+                return true;
+            }       
         }
     }
 }
