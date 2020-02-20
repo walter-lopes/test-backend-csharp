@@ -25,7 +25,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
         {
             var key = GetKeyValue(parse);
 
-            var issuerDto = new IssuerParserDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
+            var issuerDto = new IssuerParseDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
 
             _cache.Set(key, issuerDto);
 
@@ -36,17 +36,17 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
         {
             var key = GetKeyValue(parse);
 
-            _cache.DeleteByKey<IssuerParserDto>(key);
+            _cache.DeleteByKey<IssuerParseDto>(key);
 
             await _repository.Delete(parse);
         }
 
         public async Task<IReadOnlyCollection<IssuerParse>> GetAll()
         {
-            var issuers = _cache.GetAll<IssuerParserDto>();
+            var issuers = _cache.GetAll<IssuerParseDto>();
 
             if (issuers.Any())
-                return IssuerParserDto.ToDomain(issuers);
+                return IssuerParseDto.ToDomain(issuers);
 
             return await _repository.GetAll();
         }
@@ -55,7 +55,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
         {
             var key = GetKeyValue(issuerNameCetip);
 
-            var issuerDto = _cache.Get<IssuerParserDto>(key);
+            var issuerDto = _cache.Get<IssuerParseDto>(key);
 
             if (issuerDto is null)
                 return await _repository.GetBy(issuerNameCetip);
@@ -69,7 +69,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
 
             var key = GetKeyValue(parse.IssuerNameCetip);
 
-            var issuerParseDto = new IssuerParserDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
+            var issuerParseDto = new IssuerParseDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
 
             _cache.Set(key, issuerParseDto);
         }
