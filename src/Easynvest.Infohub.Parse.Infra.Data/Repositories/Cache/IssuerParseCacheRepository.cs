@@ -25,11 +25,11 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
         {
             var key = GetKeyValue(parse);
 
-            var issuerDto = new IssuerParseCacheDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
-
-            _cache.Set(key, issuerDto);
+            var issuerDto = new IssuerParseCacheDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);      
 
             await _repository.Create(parse);
+
+            _cache.Set(key, issuerDto);
         }
 
         public async Task Delete(IssuerParse parse)
