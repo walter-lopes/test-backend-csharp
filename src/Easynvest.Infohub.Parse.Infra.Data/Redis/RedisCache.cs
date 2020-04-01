@@ -30,10 +30,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Redis
             if (this.IsUnavailable())
                 return default;
 
-            using (redisClient)
-            {
-                return redisClient.Get<T>(key);
-            }
+            return redisClient.Get<T>(key);
         }
 
         public IList<T> GetAll<T>()
