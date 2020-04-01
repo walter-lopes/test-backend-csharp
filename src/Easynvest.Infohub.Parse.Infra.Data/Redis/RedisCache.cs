@@ -21,18 +21,11 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Redis
 
         public void DeleteByKey<T>(string key)
         {
-
-            if (this.IsUnavailable())
-                return;
-
-            using (redisClient)
-            {
-                redisClient.Del(key);
-            }
-
+            if (this.IsUnavailable()) return;
+            redisClient.Del(key);
         }
 
-        public T Get<T>(string key)
+        public virtual T Get<T>(string key)
         {
             if (this.IsUnavailable())
                 return default;
@@ -45,33 +38,22 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Redis
 
         public IList<T> GetAll<T>()
         {
-            if (this.IsUnavailable())
-                return new List<T>();
+            if (this.IsUnavailable()) return new List<T>();
 
-            using (redisClient)
-            {
-                var keys = redisClient.GetAllKeys();
+            var keys = redisClient.GetAllKeys();
 
-                IList<T> values = new List<T>(keys.Count);
+            IList<T> values = new List<T>(keys.Count);
 
-                foreach (var key in keys)
-                {
-                    values.Add(redisClient.Get<T>(key));
-                }
+            foreach (var key in keys) values.Add(redisClient.Get<T>(key));
 
-                return values;
-            }
+            return values;
         }
 
         public void Set<T>(string key, T obj)
         {
-            if (this.IsUnavailable())
-                return;
+            if (this.IsUnavailable()) return;
 
-            using (redisClient)
-            {
-                redisClient.Set(key, obj);
-            }
+            redisClient.Set(key, obj);
         }
 
         private bool IsUnavailable()
@@ -84,7 +66,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Redis
             {
                 _logger.LogError("Falha ao conectar com o Redis" + ex);
                 return true;
-            }       
+            }
         }
     }
 }

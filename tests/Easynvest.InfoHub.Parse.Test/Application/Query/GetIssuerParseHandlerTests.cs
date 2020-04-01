@@ -15,7 +15,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
     public class GetIssuerParseHandlerTests
     {
         private ILogger<GetIssuerParseHandler> _logger;
-        private Func<RepositoryType, IIssuerParseRepository> _issuerParseRepository;
+        private IIssuerParseRepository _issuerParseRepository;
         private GetIssuerParseHandler _getIssuerParseHandler;
         private AuthenticatedUser _authenticatedUser;
        
@@ -23,7 +23,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
         [SetUp]
         public void SetUp()
         {
-            _issuerParseRepository = Substitute.For<Func<RepositoryType, IIssuerParseRepository>>();
+            _issuerParseRepository = Substitute.For<IIssuerParseRepository>();
             _logger = Substitute.For<ILogger<GetIssuerParseHandler>>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
             
@@ -49,9 +49,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
         [TestCase("ABC")]
         public void Should_Return_Response_Failure_With_Exception(string issuerNemCetip)
         {
-            var mock = _issuerParseRepository(RepositoryType.Cache);
-
-            mock.When(x => x.GetBy(issuerNemCetip)).Do(x => throw new Exception());
+            _issuerParseRepository.When(x => x.GetBy(issuerNemCetip)).Do(x => throw new Exception());
 
             Assert.ThrowsAsync<Exception>(async () => await _getIssuerParseHandler.Handle(new GetIssuerParseQuery { IssuerNameCetip = issuerNemCetip }, CancellationToken.None));
         }

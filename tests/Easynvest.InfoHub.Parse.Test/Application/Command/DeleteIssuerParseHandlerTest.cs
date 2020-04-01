@@ -22,7 +22,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
     {
         private ILogger<DeleteIssuerParseHandler> _logger;
         private DeleteIssuerParseHandler _deleteIssuerHandler;
-        private Func<RepositoryType, IIssuerParseRepository> _issuerParseRepository;
+        private IIssuerParseRepository _issuerParseRepository;
         private AuthenticatedUser _authenticatedUser;
        
         private IMediator _mediator;
@@ -31,7 +31,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
         public void SetUp()
         {
             _logger = Substitute.For<ILogger<DeleteIssuerParseHandler>>();
-            _issuerParseRepository = Substitute.For<Func<RepositoryType, IIssuerParseRepository>>();
+            _issuerParseRepository = Substitute.For<IIssuerParseRepository>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
             
             _mediator = Substitute.For<IMediator>();
@@ -76,9 +76,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
 
             var deleteIssuerParseCommand = new DeleteIssuerParseCommand { IssuerNameCetip = issuerNameCetip };
 
-            var mock = _issuerParseRepository(RepositoryType.Cache);
-
-            mock.When(x => x.Delete(Arg.Any<IssuerParse>())).Do(x => throw new Exception());
+            _issuerParseRepository.Delete(Arg.Any<IssuerParse>()).Returns(x => throw new Exception());
 
             Assert.ThrowsAsync<Exception>(async () => await _deleteIssuerHandler.Handle(deleteIssuerParseCommand, CancellationToken.None));
         }

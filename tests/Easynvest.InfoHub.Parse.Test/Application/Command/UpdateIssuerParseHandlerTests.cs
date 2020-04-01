@@ -22,7 +22,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
     {
         private ILogger<UpdateIssuerParseHandler> _logger;
         private UpdateIssuerParseHandler _updateIssuerHandler;
-        private Func<RepositoryType, IIssuerParseRepository> _issuerParseRepository;
+        private IIssuerParseRepository _issuerParseRepository;
         private AuthenticatedUser _authenticatedUser;
        
         private IMediator _mediator;
@@ -31,7 +31,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
         public void SetUp()
         {
             _logger = Substitute.For<ILogger<UpdateIssuerParseHandler>>();
-            _issuerParseRepository = Substitute.For<Func<RepositoryType, IIssuerParseRepository>>();
+            _issuerParseRepository = Substitute.For<IIssuerParseRepository>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
             
             _mediator = Substitute.For<IMediator>();
@@ -52,9 +52,8 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Command
 
             var issuerParse = new IssuerParseDto { IssuerNameCetip = issuerNameCetip, IssuerNameCustodyManager = issuerNameCustodyManager };
             var updateIssuerRequest = new UpdateIssuerParseCommand {IssuerParse = issuerParse};
-            var mock = _issuerParseRepository(RepositoryType.Cache);
 
-            mock.When(x => x.Update(Arg.Any<IssuerParse>())).Do(x => throw new Exception());
+            _issuerParseRepository.Update(Arg.Any<IssuerParse>()).Returns(x => throw new Exception());
 
             Assert.ThrowsAsync<Exception>(async () => await _updateIssuerHandler.Handle(updateIssuerRequest, CancellationToken.None));
         }

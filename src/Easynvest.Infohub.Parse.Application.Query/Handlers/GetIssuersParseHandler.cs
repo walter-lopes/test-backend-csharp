@@ -20,12 +20,11 @@ namespace Easynvest.Infohub.Parse.Application.Query.Handlers
         private readonly AuthenticatedUser _authenticatedUser;
        
 
-        public GetIssuersParseHandler(ILogger<GetIssuersParseHandler> logger, AuthenticatedUser authenticatedUser, Func<RepositoryType, IIssuerParseRepository> issuerParseRepository)
+        public GetIssuersParseHandler(ILogger<GetIssuersParseHandler> logger, AuthenticatedUser authenticatedUser, IIssuerParseRepository issuerParseRepository)
         {
             _logger = logger;
             _authenticatedUser = authenticatedUser;
-            
-            _issuerParseRepository = issuerParseRepository(RepositoryType.Cache);
+            _issuerParseRepository = issuerParseRepository;
         }
 
         public async Task<Response<GetIssuersParseResponse>> Handle(GetIssuersParseQuery request, CancellationToken cancellationToken)

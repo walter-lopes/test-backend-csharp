@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache.Dto
 {
-    public class IssuerParseDto
+    public class IssuerParseCacheDto
     {
         public string IssuerNameCustodyManager { get; set; }
 
         public string IssuerNameCetip { get; set; }
 
-        public IssuerParseDto() { }
+        public IssuerParseCacheDto() { }
 
-        public IssuerParseDto(string issuerNameCustodyManager, string issuerNameCetip)
+        public IssuerParseCacheDto(string issuerNameCustodyManager, string issuerNameCetip)
         {
             this.IssuerNameCustodyManager = issuerNameCustodyManager;
             this.IssuerNameCetip = issuerNameCetip;
@@ -20,7 +20,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache.Dto
 
         public IssuerParse ToDomain() => IssuerParse.Create(this.IssuerNameCustodyManager, this.IssuerNameCetip).Value;
 
-        public static IReadOnlyCollection<IssuerParse> ToDomain(IList<IssuerParseDto> dtos)
+        public static IReadOnlyCollection<IssuerParse> ToDomain(IList<IssuerParseCacheDto> dtos)
         {
             IList<IssuerParse> issuers = new List<IssuerParse>();
 

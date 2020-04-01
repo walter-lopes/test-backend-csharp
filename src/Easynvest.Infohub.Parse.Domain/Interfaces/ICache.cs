@@ -7,7 +7,7 @@ namespace Easynvest.Infohub.Parse.Domain.Interfaces
     {
         void Set<T>(string key,  T obj);
 
-        T Get<T>(string key);
+        T Get<T> (string key);
 
         void DeleteByKey<T>(string key);
 

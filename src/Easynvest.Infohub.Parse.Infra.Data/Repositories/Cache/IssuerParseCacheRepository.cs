@@ -15,9 +15,9 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
         private readonly IIssuerParseRepository _repository;
         private readonly string _key = "IssuerParse";
 
-        public IssuerParseCacheRepository(Func<RepositoryType, IIssuerParseRepository> repository, ICache cache)
+        public IssuerParseCacheRepository(IIssuerParseRepository repository, ICache cache)
         {
-            _repository = repository(RepositoryType.Database);
+            _repository = repository;
             _cache = cache;
         }
 
@@ -25,7 +25,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
         {
             var key = GetKeyValue(parse);
 
-            var issuerDto = new IssuerParseDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
+            var issuerDto = new IssuerParseCacheDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
 
             _cache.Set(key, issuerDto);
 
@@ -36,17 +36,17 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
         {
             var key = GetKeyValue(parse);
 
-            _cache.DeleteByKey<IssuerParseDto>(key);
+            _cache.DeleteByKey<IssuerParseCacheDto>(key);
 
             await _repository.Delete(parse);
         }
 
         public async Task<IReadOnlyCollection<IssuerParse>> GetAll()
         {
-            var issuers = _cache.GetAll<IssuerParseDto>();
+            var issuers = _cache.GetAll<IssuerParseCacheDto>();
 
             if (issuers.Any())
-                return IssuerParseDto.ToDomain(issuers);
+                return IssuerParseCacheDto.ToDomain(issuers);
 
             return await _repository.GetAll();
         }
@@ -55,7 +55,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
         {
             var key = GetKeyValue(issuerNameCetip);
 
-            var issuerDto = _cache.Get<IssuerParseDto>(key);
+            var issuerDto = _cache.Get<IssuerParseCacheDto>(key);
 
             if (issuerDto is null)
                 return await _repository.GetBy(issuerNameCetip);
@@ -69,7 +69,7 @@ namespace Easynvest.Infohub.Parse.Infra.Data.Repositories.Cache
 
             var key = GetKeyValue(parse.IssuerNameCetip);
 
-            var issuerParseDto = new IssuerParseDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
+            var issuerParseDto = new IssuerParseCacheDto(parse.IssuerNameCustodyManager, parse.IssuerNameCetip);
 
             _cache.Set(key, issuerParseDto);
         }

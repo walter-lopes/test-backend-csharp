@@ -22,13 +22,13 @@ namespace Easynvest.Infohub.Parse.Application.Command.Handlers
        
         private readonly IMediator _mediator;
 
-        public UpdateIssuerParseHandler(ILogger<UpdateIssuerParseHandler> logger, AuthenticatedUser authenticatedUser, Func<RepositoryType, IIssuerParseRepository> issuerParseRepository,
+        public UpdateIssuerParseHandler(ILogger<UpdateIssuerParseHandler> logger, AuthenticatedUser authenticatedUser, IIssuerParseRepository issuerParseRepository,
             IMediator mediator)
         {
             _logger = logger;
             _authenticatedUser = authenticatedUser;
-            
-            _issuerParseRepository = issuerParseRepository(RepositoryType.Cache);
+
+            _issuerParseRepository = issuerParseRepository;
             _mediator = mediator;
         }
 

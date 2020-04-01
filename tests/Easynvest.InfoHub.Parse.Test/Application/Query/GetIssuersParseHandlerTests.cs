@@ -16,7 +16,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
     public class GetIssuersParseHandlerTests
     {
         private ILogger<GetIssuersParseHandler> _logger;
-        private Func<RepositoryType, IIssuerParseRepository> _issuerParseRepository;
+        private IIssuerParseRepository _issuerParseRepository;
         private GetIssuersParseHandler _getIssuersHandler;
         private AuthenticatedUser _authenticatedUser;
 
@@ -25,7 +25,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
         public void SetUp()
         {
             _logger = Substitute.For<ILogger<GetIssuersParseHandler>>();
-            _issuerParseRepository = Substitute.For<Func<RepositoryType, IIssuerParseRepository>>();
+            _issuerParseRepository = Substitute.For<IIssuerParseRepository>();
             _authenticatedUser = new AuthenticatedUser(Substitute.For<IHttpContextAccessor>());
             _getIssuersHandler = new GetIssuersParseHandler(_logger, _authenticatedUser, _issuerParseRepository);
         }
@@ -33,9 +33,7 @@ namespace Easynvest.InfoHub.Parse.Test.Application.Query
         [Test]
         public void Should_Return_Response_Failure_With_Exception()
         {
-            var mock = _issuerParseRepository(RepositoryType.Cache);
-
-            mock.When(x => x.GetAll()).Do(x => throw new Exception());
+            _issuerParseRepository.When(x => x.GetAll()).Do(x => throw new Exception());
 
             Assert.ThrowsAsync<Exception>(async () => await _getIssuersHandler.Handle(new GetIssuersParseQuery(), CancellationToken.None));
         }
